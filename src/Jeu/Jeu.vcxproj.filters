@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <ItemGroup>
+    <Filter Include="header">
+      <UniqueIdentifier>{6CEFBF6D-D2B2-4368-B3AC-4FED4E8E8266}</UniqueIdentifier>
+      <Extensions>h;hpp</Extensions>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{E8A6235E-94C4-4C1D-BD17-557C49BD854C}</UniqueIdentifier>
+      <Extensions>hlsl;jpg;jpeg;png;wav;mp3;ico;dds;rc;obj</Extensions>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{AB5CC3B2-23D8-4292-988B-F17DA971C546}</UniqueIdentifier>
+      <Extensions>cpp;c</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\Jeu\main.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\Jeu\pch.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\..\src\Jeu\main.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Jeu\pch.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\Jeu\resource.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <None Include="..\..\..\src\Jeu\app.ico">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="..\..\..\src\Jeu\app.rc">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="..\..\..\src\Jeu\small.ico">
+      <Filter>resource</Filter>
+    </None>
+    <ClCompile Include="Player.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Player.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>header</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>header</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
