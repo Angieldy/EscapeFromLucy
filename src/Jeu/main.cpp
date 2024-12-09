@@ -23,7 +23,7 @@ int main()
 
         sf::Texture txtplayer;
 
-        if (!txtplayer.loadFromFile("../../../src/Jeu/perso.png"))
+        if (!txtplayer.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/perso.png"))
         {
             return -1;
         }
@@ -36,8 +36,8 @@ int main()
         player.setPosition(x, y);
         player.setScale(1, 1);
 
-		sf::View view(sf::FloatRect(0, 0, 1400, 800));
-		view.setCenter(player.getPosition());
+		//sf::View view(sf::FloatRect(0, 0, 1400, 800));
+		//view.setCenter(player.getPosition());
 
 		sf::Keyboard::Key last;
 
