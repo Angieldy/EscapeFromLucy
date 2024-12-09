@@ -23,14 +23,15 @@ int main()
 
         sf::Texture txtplayer;
 
-        if (!txtplayer.loadFromFile("C:/Users/lchatonnet/source/repos/EscapeFromLucy-main/src/Jeu/perso.png"))
+        if (!txtplayer.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/perso.png"))
+
         {
             return -1;
         }
 
         sf::Sprite player(txtplayer);
 
-        player.setTextureRect(sf::IntRect(35, 40, 10, 10));
+        player.setTextureRect(sf::IntRect(10, 250, 100, 100));
         int x = 1;
         int y = 1;
         player.setPosition(x, y);
@@ -78,9 +79,9 @@ int main()
 
             float deltaTime = clock.restart().asSeconds();
 
-            /*view.setCenter(player.getPosition());
+            view.setCenter(player.getPosition());
 
-            window.setView(view);*/
+            window.setView(view);
 
             player.setPosition(x, y);
 
