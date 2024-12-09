@@ -22,13 +22,13 @@ int main()
 
 		sf::Sprite spone(texture);
         spone.setPosition(50, 25);
-        //spone.setOrigin(800, 145);
+        spone.setOrigin(800, 145);
         spone.setTextureRect(sf::IntRect(0, 0, 379, 298));
         spone.setScale(4,3);
 
         sf::Texture txtplayer;
 
-        if (!txtplayer.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/isaac.png"))
+        if (!txtplayer.loadFromFile("C:/Users/lchatonnet/source/repos/EscapeFromLucy-main/src/Jeu/png/isaac.png"))
         {
             return -1;
         }
@@ -41,8 +41,8 @@ int main()
         player.setPosition(x, y);
         player.setScale(1.5, 1.5);
 
-		//sf::View view(sf::FloatRect(0, 0, 1400, 800));
-		//view.setCenter(player.getPosition());
+		sf::View view(sf::FloatRect(0, 0, 1400, 800));
+		view.setCenter(player.getPosition());
 
 		sf::Keyboard::Key last;
 
@@ -54,40 +54,33 @@ int main()
             {
                 if (event.type == sf::Event::Closed)
                     window.close();
+            }
 
-                if (event.type == sf::Event::KeyPressed)
-                {
-                    last = event.key.code;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+            {
+                player.move(0.1f, 0.f);
+            }
 
-                    if (last == sf::Keyboard::D)
-                    {
-                        x += 10;
-                    }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+            {
+                player.move(-0.1f, 0.f);
+            }
 
-                    else if (last == sf::Keyboard::Q)
-                    {
-                        x -= 10;
-                    }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            {
+                player.move(0.f, 0.1f);
+            }
 
-                    else if (last == sf::Keyboard::Z)
-                    {
-                        y -= 10;
-                    }
-
-                    else if (last == sf::Keyboard::S)
-                    {
-                        y += 10;
-                    }
-                }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+            {
+                player.move(0.f, -0.1f);
             }
 
             float deltaTime = clock.restart().asSeconds();
 
-           /* view.setCenter(player.getPosition());
+           view.setCenter(player.getPosition());
 
-            window.setView(view);*/
-
-            player.setPosition(x, y);
+            window.setView(view);
 
             window.clear();
 
