@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "main.h"
+#include <SFML/Graphics.hpp>
+#include <vector>
 
 int main()
 {
