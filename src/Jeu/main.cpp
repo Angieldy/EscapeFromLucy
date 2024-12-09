@@ -18,11 +18,12 @@ int main()
 
 		sf::Sprite spone(texture);
 		spone.setOrigin(700, 400);
-		spone.setTextureRect(sf::IntRect(0, 0, 300, 250));
+        spone.setScale(sf::Vector2f(10, 10));
+		spone.setTextureRect(sf::IntRect(0, 0, 250, 200));
 
         sf::Texture txtplayer;
 
-        if (!txtplayer.loadFromFile("../../../src/Jeu/perso skin.png"))
+        if (!txtplayer.loadFromFile("../../../src/Jeu/perso.png"))
         {
             return -1;
         }
