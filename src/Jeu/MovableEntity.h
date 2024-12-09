@@ -1,5 +1,11 @@
 #pragma once
-class MovableEntity
+#include "Entity.h"
+
+class MovableEntity : Entity
 {
+public:
+	MovableEntity();
+
+	void moveEntity(float x, float y);
 };
 

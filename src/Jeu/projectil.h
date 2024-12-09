@@ -1,5 +1,9 @@
 #pragma once
-class projectil
+#include "collidable.h"
+#include "MovableEntity.h"
+#include "Attaque.h"
+
+class projectil : collidable, MovableEntity, Attaque
 {
 };
 

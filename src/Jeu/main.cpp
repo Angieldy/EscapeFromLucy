@@ -1,13 +1,17 @@
 #include "pch.h"
 #include "main.h"
 #include <SFML/Graphics.hpp>
+#include <iostream>
+#include <vector>
+#include <string>
+
 
 int main()
 {
 #ifdef _DEBUG
 	_CrtDumpMemoryLeaks();
 #endif
-		sf::RenderWindow window(sf::VideoMode(1400, 800), "Escape From Luccy");
+		sf::RenderWindow window(sf::VideoMode(1600, 1000), "Escape From Luccy");
 
 		sf::Texture texture;
 
@@ -17,25 +21,25 @@ int main()
 		}
 
 		sf::Sprite spone(texture);
-		spone.setOrigin(700, 400);
-        spone.setScale(sf::Vector2f(10, 10));
-		spone.setTextureRect(sf::IntRect(0, 0, 250, 200));
+        spone.setPosition(50, 25);
+        //spone.setOrigin(800, 145);
+        spone.setTextureRect(sf::IntRect(0, 0, 379, 298));
+        spone.setScale(4,3);
 
         sf::Texture txtplayer;
 
-        if (!txtplayer.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/perso.png"))
-
+        if (!txtplayer.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/isaac.png"))
         {
             return -1;
         }
 
         sf::Sprite player(txtplayer);
 
-        player.setTextureRect(sf::IntRect(10, 250, 100, 100));
-        int x = 1;
-        int y = 1;
+        player.setTextureRect(sf::IntRect(0, 0, 148, 125));
+        int x = 700;
+        int y = 400;
         player.setPosition(x, y);
-        player.setScale(1, 1);
+        player.setScale(1.5, 1.5);
 
 		//sf::View view(sf::FloatRect(0, 0, 1400, 800));
 		//view.setCenter(player.getPosition());
@@ -55,22 +59,22 @@ int main()
                 {
                     last = event.key.code;
 
-                    if (last == 72)
+                    if (last == sf::Keyboard::D)
                     {
                         x += 10;
                     }
 
-                    else if (last == 71)
+                    else if (last == sf::Keyboard::Q)
                     {
                         x -= 10;
                     }
 
-                    else if (last == 73)
+                    else if (last == sf::Keyboard::Z)
                     {
                         y -= 10;
                     }
 
-                    else if (last == 74)
+                    else if (last == sf::Keyboard::S)
                     {
                         y += 10;
                     }
@@ -79,15 +83,16 @@ int main()
 
             float deltaTime = clock.restart().asSeconds();
 
-            view.setCenter(player.getPosition());
+           /* view.setCenter(player.getPosition());
 
-            window.setView(view);
+            window.setView(view);*/
 
             player.setPosition(x, y);
 
             window.clear();
 
             window.draw(spone);
+
             window.draw(player);
 
             window.display();

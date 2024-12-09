@@ -1,5 +1,9 @@
 #pragma once
-class LivingEntity
+#include "collidable.h"
+#include "MovableEntity.h"
+#include "Attaque.h"
+
+class LivingEntity : collidable, MovableEntity, Attaque
 {
 };
 

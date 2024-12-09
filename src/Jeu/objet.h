@@ -1,5 +1,8 @@
 #pragma once
-class objet
+#include "Entity.h"
+#include "collidable.h"
+
+class objet : Entity, collidable
 {
 };
 

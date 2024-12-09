@@ -1,5 +1,7 @@
 #pragma once
-class Player
+#include "LivingEntity.h"
+
+class Player : LivingEntity
 {
 };
 
