@@ -22,46 +22,46 @@ int main()
     std::vector<sf::RectangleShape> doors;
 
     sf::RectangleShape wall1(sf::Vector2f(50, 200));
-    wall1.setFillColor(sf::Color::Black);
+    wall1.setFillColor(sf::Color(255, 255, 255, 1)); // rend transparent
     wall1.setPosition(100, 190);
-    walls.push_back(wall1);
     wall1.setScale(3, 3);
+    walls.push_back(wall1);
 
     sf::RectangleShape wall2(sf::Vector2f(360, 50));
-    wall2.setFillColor(sf::Color::Black);
+    wall2.setFillColor(sf::Color(255, 255, 255, 1));
     wall2.setPosition(250, 30);
-    walls.push_back(wall2);
     wall2.setScale(3, 3);
+    walls.push_back(wall2);
 
     sf::RectangleShape wall3(sf::Vector2f(50, 200));
-    wall3.setFillColor(sf::Color::Black);
+    wall3.setFillColor(sf::Color(255, 255, 255, 1));
     wall3.setPosition(1330, 180);
-    walls.push_back(wall3);
     wall3.setScale(3, 3);
+    walls.push_back(wall3);
 
     sf::RectangleShape wall4(sf::Vector2f(360, 50));
-    wall4.setFillColor(sf::Color::Black);
+    wall4.setFillColor(sf::Color(255, 255, 255, 1));
     wall4.setPosition(250, 780);
-    walls.push_back(wall4);
     wall4.setScale(3, 3);
+    walls.push_back(wall4);
 
     sf::RectangleShape door2(sf::Vector2f(40, 60));
     door2.setFillColor(sf::Color::Red);
     door2.setPosition(720, -50);
-    doors.push_back(door2);
     door2.setScale(3, 3);
+    doors.push_back(door2);
 
     sf::RectangleShape door1(sf::Vector2f(60, 20));
     door1.setFillColor(sf::Color::Red);
     door1.setPosition(80, 440);
-    doors.push_back(door1);
     door1.setScale(3, 3);
+    doors.push_back(door1);
 
     sf::RectangleShape door3(sf::Vector2f(60, 20));
     door3.setFillColor(sf::Color::Red);
     door3.setPosition(1330, 440);
-    doors.push_back(door3);
     door3.setScale(3, 3);
+    doors.push_back(door3);
 
     Player player;
     projectil Projectil;
@@ -119,7 +119,7 @@ int main()
             }
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && player.getPosition().x < 1200)
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !player.WallCollision(wall3, player.spritePlayer))//1200
         {
             const auto& currentSheets = player.sheetsRight;
             totalFrames = currentSheets.size();
@@ -134,7 +134,7 @@ int main()
             player.move(0.05f, 0.f);
         }
 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && player.getPosition().x > 150)
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && !player.WallCollision(wall1, player.spritePlayer))//150
         {
             const auto& currentSheets = player.sheetsLeft;
             totalFrames = currentSheets.size();
@@ -149,7 +149,7 @@ int main()
             player.move(-0.05f, 0.f);
         }
 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && player.getPosition().y < 630)
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && !player.WallCollision(wall4, player.spritePlayer))//530
         {
             const auto& currentSheets = player.sheetsDown;
             totalFrames = currentSheets.size();
@@ -164,7 +164,7 @@ int main()
             player.move(0.f, 0.05f);
         }
 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && player.getPosition().y > 60)
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !player.WallCollision(wall2, player.spritePlayer))//60
         {
             const auto& currentSheets = player.sheetsUP;
             totalFrames = currentSheets.size();
@@ -184,17 +184,17 @@ int main()
             player.spritePlayer.setTexture(player.texturePause1);
         }
 
-        window.clear(sf::Color::White);
+        window.clear(sf::Color::Black);
 
+        
+        window.draw(scene);
         window.draw(wall1);
         window.draw(wall2);
         window.draw(wall3);
         window.draw(wall4);
-        window.draw(scene);
         window.draw(door1);
         window.draw(door2);
         window.draw(door3);
-
 
         window.draw(player);
         window.draw(Projectil);
