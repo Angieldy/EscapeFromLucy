@@ -180,7 +180,7 @@ Player::Player()
 
 	spritePlayer.setTexture(textureLeft10);
 	spritePlayer.setPosition(700, 400);
-	spritePlayer.setOrigin((3.f * 31) / 2, (3.f*38)/2);
+	spritePlayer.setOrigin(46.5, 57);
 	spritePlayer.setScale(sf::Vector2f(3.f, 3.f));
 
 	sheetsUP.push_back(&textureUp1);
@@ -226,6 +226,12 @@ Player::Player()
 	sheetsRight.push_back(&textureRigth8);
 	sheetsRight.push_back(&textureRigth9);
 	sheetsRight.push_back(&textureRigth10);
+
+
+	const sf::Vector2f spriteSize(
+		spritePlayer.getTexture()->getSize().x * spritePlayer.getScale().x,
+		spritePlayer.getTexture()->getSize().y * spritePlayer.getScale().y);
+	std::cerr << spriteSize.x << " " << spriteSize.y << std::endl;
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const

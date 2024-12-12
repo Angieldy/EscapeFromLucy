@@ -22,13 +22,14 @@ int main()
     std::vector<sf::RectangleShape> doors;
 
     sf::RectangleShape wall1(sf::Vector2f(50, 200));
-    wall1.setFillColor(sf::Color(255, 255, 255, 1)); // rend transparent
+    wall1.setFillColor(sf::Color(255, 255, 255, 128)); // rend transparent
     wall1.setPosition(100, 190);
     wall1.setScale(3, 3);
     walls.push_back(wall1);
 
+
     sf::RectangleShape wall2(sf::Vector2f(360, 50));
-    wall2.setFillColor(sf::Color(255, 255, 255, 1));
+    wall2.setFillColor(sf::Color(255, 255, 255, 1128));
     wall2.setPosition(250, 30);
     wall2.setScale(3, 3);
     walls.push_back(wall2);
@@ -81,45 +82,11 @@ int main()
                 window.close();
         }
 
-        bool collision = false;
-        for (const auto& wall : walls)
-        {
-            if (player.WallCollision(wall1, player.spritePlayer))
-            {
-                collision = true;
-            }
-            else if (player.WallCollision(wall2, player.spritePlayer))
-            {
-                collision = true;
-            }
-            else if (player.WallCollision(wall3, player.spritePlayer))
-            {
-                collision = true;
-            }
-            else if (player.WallCollision(wall4, player.spritePlayer))
-            {
-                collision = true;
-            }
-        }
-        for (const auto& door : doors)
-        {
-            if (player.DoorsCollision(door1, player.spritePlayer))
-            {
-                collision = true;
-                const auto& currentSheets = scene.sheetsRoom;
-                scene.room.setTexture(*currentSheets[1]); //Right Room
-            }
-            else if (player.DoorsCollision(door2, player.spritePlayer))
-            {
-                collision = true;
-            }
-            else if (player.DoorsCollision(door3, player.spritePlayer))
-            {
-                collision = true;
-            }
-        }
+        sf::FloatRect playerGlobalBounds = player.spritePlayer.getGlobalBounds();
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !player.WallCollision(wall3, player.spritePlayer))//1200
+        playerGlobalBounds = player.getTransform().transformRect(playerGlobalBounds);
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && !player.WallCollision(wall3, playerGlobalBounds))//1200
         {
             const auto& currentSheets = player.sheetsRight;
             totalFrames = currentSheets.size();
@@ -134,7 +101,7 @@ int main()
             player.move(0.05f, 0.f);
         }
 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && !player.WallCollision(wall1, player.spritePlayer))//150
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && !player.WallCollision(wall1, playerGlobalBounds))//150
         {
             const auto& currentSheets = player.sheetsLeft;
             totalFrames = currentSheets.size();
@@ -149,7 +116,7 @@ int main()
             player.move(-0.05f, 0.f);
         }
 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && !player.WallCollision(wall4, player.spritePlayer))//530
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && !player.WallCollision(wall4, playerGlobalBounds))//530
         {
             const auto& currentSheets = player.sheetsDown;
             totalFrames = currentSheets.size();
@@ -164,7 +131,7 @@ int main()
             player.move(0.f, 0.05f);
         }
 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !player.WallCollision(wall2, player.spritePlayer))//60
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !player.WallCollision(wall2, playerGlobalBounds))//60
         {
             const auto& currentSheets = player.sheetsUP;
             totalFrames = currentSheets.size();
@@ -188,13 +155,13 @@ int main()
 
         
         window.draw(scene);
+        window.draw(door1);
+        window.draw(door2);
+        window.draw(door3);
         window.draw(wall1);
         window.draw(wall2);
         window.draw(wall3);
         window.draw(wall4);
-        window.draw(door1);
-        window.draw(door2);
-        window.draw(door3);
 
         window.draw(player);
         window.draw(Projectil);
