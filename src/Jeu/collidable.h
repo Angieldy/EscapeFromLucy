@@ -1,12 +1,14 @@
 #pragma once
-#include"Entity.h"
+#include"MovableEntity.h"
 
-class collidable : Entity
+class collidable : public MovableEntity
 {
 public:
 
 	collidable();
 
-	bool collide(const sf::Sprite& other, const sf::Sprite& other2) const;
+	bool collideSprite(const sf::Sprite& other, const sf::Sprite& other2) const;
+	bool WallCollision(const sf::RectangleShape& rect1, const sf::Sprite& player) const;
+	bool DoorsCollision(const sf::RectangleShape& rect1, const sf::Sprite& player) const;
 };
 

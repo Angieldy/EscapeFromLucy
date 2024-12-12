@@ -1,7 +1,7 @@
 #pragma once
 #include "Entity.h"
 
-class MovableEntity : Entity
+class MovableEntity : public Entity
 {
 public:
 	MovableEntity();
