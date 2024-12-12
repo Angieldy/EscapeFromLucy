@@ -180,8 +180,8 @@ Player::Player()
 
 	spritePlayer.setTexture(textureLeft10);
 	spritePlayer.setPosition(700, 400);
-	spritePlayer.setOrigin((2.f * 31) / 2, (2.f*38)/2);
-	spritePlayer.setScale(sf::Vector2f(2.f, 2.f));
+	spritePlayer.setOrigin((3.f * 31) / 2, (3.f*38)/2);
+	spritePlayer.setScale(sf::Vector2f(3.f, 3.f));
 
 	sheetsUP.push_back(&textureUp1);
 	sheetsUP.push_back(&textureUp2);

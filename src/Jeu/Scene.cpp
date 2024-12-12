@@ -4,14 +4,14 @@
 
 Scene::Scene()
 {
-    if (!spone.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/png/spone.png"))
+    if (!spone.loadFromFile("../../../src/Jeu/png/spone.png"))
     {
-        std::cerr << "Impossible de charger la textur  Left5!" << std::endl;
+        std::cerr << "Impossible de charger la textur  spone!" << std::endl;
     }
 
-    if (!rightroom.loadFromFile("C:/Users/aledey/source/repos/SolutionGenerator/x64/Debug/Jeu/src/Jeu/png/womb.png"))
+    if (!rightroom.loadFromFile("../../../src/Jeu/png/womb.png"))
     {
-        std::cerr << "Impossible de charger la textur  Left5!" << std::endl;
+        std::cerr << "Impossible de charger la textur  rightroom!" << std::endl;
     }
 
     room.setTexture(spone);

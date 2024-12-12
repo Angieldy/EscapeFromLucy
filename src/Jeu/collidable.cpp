@@ -17,10 +17,18 @@ bool collidable::collideSprite(const sf::Sprite& other1, const sf::Sprite& other
 
 bool collidable::WallCollision(const sf::RectangleShape& rect1, const sf::Sprite& player) const
 {
-	return rect1.getGlobalBounds().intersects(player.getGlobalBounds());
+	if (player.getGlobalBounds().intersects(rect1.getGlobalBounds()))
+	{
+		return true;
+	}
+	return false;
 }
 
 bool collidable::DoorsCollision(const sf::RectangleShape& rect1, const sf::Sprite& player) const
 {
-	return rect1.getGlobalBounds().intersects(player.getGlobalBounds());
+	if (player.getGlobalBounds().intersects(rect1.getGlobalBounds()))
+	{
+		return true;
+	}
+	return false;
 }
