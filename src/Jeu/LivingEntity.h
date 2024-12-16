@@ -4,5 +4,11 @@
 
 class LivingEntity : public collidable, public Attaque
 {
+public:
+
+	int mMaxHealth;
+	int mCurrentHealth;
+	int mAttack;
+
 };
 

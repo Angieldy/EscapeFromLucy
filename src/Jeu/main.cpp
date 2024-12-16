@@ -8,6 +8,8 @@
 #include "projectil.h"
 #include "Scene.h"
 #include "collidable.h"
+#include "Poop.h"
+#include "Heart.h"
 
 
 int main()
@@ -70,11 +72,17 @@ int main()
     door4.setScale(3, 3);
     doors.push_back(door4);
 
-    sf::RectangleShape shopik(sf::Vector2f(90, 40));
+    sf::RectangleShape shopik(sf::Vector2f(80, 15));
     shopik.setFillColor(sf::Color(255, 255, 255, 0));
-    shopik.setPosition(650, 450);
+    shopik.setPosition(670, 460);
     shopik.setScale(3, 3);
     other.push_back(shopik);
+
+    sf::RectangleShape HangingMan(sf::Vector2f(30, 55));
+    HangingMan.setFillColor(sf::Color(255, 255, 255, 0));
+    HangingMan.setPosition(760, 100);
+    HangingMan.setScale(3, 3);
+    other.push_back(HangingMan);
 
     sf::Font font;
 
@@ -92,6 +100,8 @@ int main()
 
     Player player;
     Scene scene;
+    Poop poop;
+    Heart heart;
 
     std::vector<projectil*> projectiles;
 
@@ -249,25 +259,30 @@ int main()
             }
         }
 
-        //for (auto it = projectiles.begin(); it != projectiles.end(); ) {
-        //    bool collisionDetected = false;
+        for (auto it = projectiles.begin(); it != projectiles.end(); ) 
+        {
+            bool collisionDetected = false;
 
-        //    // Vérifier la collision avec chaque mur (ou autre objet)
-        //    for (auto& wall : walls) {
-        //        if (player.WallCollision(wall, it->spriteLarmeBase)) {
-        //            collisionDetected = true;
-        //            break;  // On arrête dès qu'une collision est trouvée
-        //        }
-        //    }
+            // Vérifier la collision avec chaque mur (ou autre objet)
+            for (auto& wall : walls) 
+            {
+                if (player.WallCollision(wall, (*it)->Bounds((*it)->spriteLarmeBase)))
+                {
+                    collisionDetected = true;
+                    break;  // On arrête dès qu'une collision est trouvée
+                }
+            }
 
-        //    // Si une collision a été détectée, on supprime le projectile du vecteur
-        //    if (collisionDetected) {
-        //        it = projectiles.erase(it);  // Supprimer le projectile
-        //    }
-        //    else {
-        //        ++it;  // Passer au projectile suivant si pas de collision
-        //    }
-        //}
+            // Si une collision a été détectée, on supprime le projectile du vecteur
+            if (collisionDetected) 
+            {
+                it = projectiles.erase(it);  // Supprimer le projectile
+            }
+            else 
+            {
+                ++it;  // Passer au projectile suivant si pas de collision
+            }
+        }
 
         if (currentRoom == 5)
         {
@@ -361,6 +376,10 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
             else if (player.DoorsCollision(door2, player.Bounds(player.spritePlayer)) && sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
             {
@@ -373,6 +392,10 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
             else if (player.DoorsCollision(door3, player.Bounds(player.spritePlayer)) && sf::Keyboard::isKeyPressed(sf::Keyboard::D))
             {
@@ -385,6 +408,10 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
         }
 
@@ -401,6 +428,10 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
         }
 
@@ -408,6 +439,44 @@ int main()
         {
             if (player.OtherCollision(shopik, player.Bounds(player.spritePlayer)))
             {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+                {
+                    player.move(-0.05f, 0.f);
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+                {
+                    player.move(0.05f, 0.f);
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+                {
+                    player.move(0.f, -0.05f);
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+                {
+                    player.move(0.f, 0.05f);
+                }
+                
+            }
+
+            if (player.OtherCollision(HangingMan, player.Bounds(player.spritePlayer)))
+            {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+                {
+                    player.move(-0.05f, 0.f);
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+                {
+                    player.move(0.05f, 0.f);
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+                {
+                    player.move(0.f, -0.05f);
+                }
+                else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+                {
+                    player.move(0.f, 0.05f);
+                }
+
             }
 
             if (player.DoorsCollision(door1, player.Bounds(player.spritePlayer)) && sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
@@ -420,6 +489,10 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
         }
 
@@ -448,6 +521,10 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
         }
 
@@ -462,9 +539,73 @@ int main()
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
                 player.Bounds(player.spritePlayer) = player.getTransform().transformRect(player.Bounds(player.spritePlayer));
+                for (auto it = projectiles.begin(); it != projectiles.end(); )
+                {
+                    it = projectiles.erase(it);
+                }
             }
         }
-
+        
+        if (player.mCurrentHealth == 11)
+        {
+            heart.Heart3.setTexture(heart.quartHeart);
+        }
+        else if (player.mCurrentHealth == 10)
+        {
+            heart.Heart3.setTexture(heart.middleHeart);
+        }
+        else if (player.mCurrentHealth == 9)
+        {
+            heart.Heart3.setTexture(heart.unQuartHeart);
+        }
+        else if (player.mCurrentHealth == 8)
+        {
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 7)
+        {
+            heart.Heart2.setTexture(heart.quartHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 6)
+        {
+            heart.Heart2.setTexture(heart.middleHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 5)
+        {
+            heart.Heart2.setTexture(heart.unQuartHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 4)
+        {
+            heart.Heart2.setTexture(heart.emptyHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 3)
+        {
+            heart.Heart1.setTexture(heart.quartHeart);
+            heart.Heart2.setTexture(heart.emptyHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 2)
+        {
+            heart.Heart1.setTexture(heart.middleHeart);
+            heart.Heart2.setTexture(heart.emptyHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 1)
+        {
+            heart.Heart1.setTexture(heart.unQuartHeart);
+            heart.Heart2.setTexture(heart.emptyHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
+        else if (player.mCurrentHealth == 0)
+        {
+            heart.Heart1.setTexture(heart.emptyHeart);
+            heart.Heart2.setTexture(heart.emptyHeart);
+            heart.Heart3.setTexture(heart.emptyHeart);
+        }
        
         window.draw(scene);
         if (currentRoom == 5)
@@ -478,17 +619,25 @@ int main()
             window.draw(aide);
             window.draw(crédits);
         }
-        window.draw(door1);
-        window.draw(door2);
-        window.draw(door3);
-        window.draw(door4);
-        window.draw(wall1);
-        window.draw(wall2);
-        window.draw(wall3);
-        window.draw(wall4);
-        window.draw(shopik);
 
-        window.draw(player);
+        else
+        {
+            window.draw(door1);
+            window.draw(door2);
+            window.draw(door3);
+            window.draw(door4);
+            window.draw(wall1);
+            window.draw(wall2);
+            window.draw(wall3);
+            window.draw(wall4);
+            window.draw(shopik);
+            window.draw(HangingMan);
+            window.draw(poop);
+
+            window.draw(heart);
+
+            window.draw(player);
+        }
 
         for (projectil* proj : projectiles) 
         {
