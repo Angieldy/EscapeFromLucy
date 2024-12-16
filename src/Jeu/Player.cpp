@@ -178,9 +178,9 @@ Player::Player()
 		std::cerr << "Impossible de charger la textur  Left10!" << std::endl;
 	}
 
-	spritePlayer.setTexture(textureLeft10);
-	spritePlayer.setPosition(700, 400);
-	spritePlayer.setOrigin(46.5, 57);
+	spritePlayer.setTexture(texturePause1);
+	setPosition(700, 400);
+	spritePlayer.setOrigin(15.5f, 19.f);
 	spritePlayer.setScale(sf::Vector2f(3.f, 3.f));
 
 	sheetsUP.push_back(&textureUp1);
