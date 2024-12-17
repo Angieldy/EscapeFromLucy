@@ -10,7 +10,15 @@
 #include "collidable.h"
 #include "Poop.h"
 #include "Heart.h"
+#include "Enemy.h"
 
+sf::Vector2f normalize(const sf::Vector2f& vector) {
+    float magnitude = std::sqrt(vector.x * vector.x + vector.y * vector.y);
+    if (magnitude == 0) {
+        return sf::Vector2f(0.f, 0.f); // Return zero vector if magnitude is zero
+    }
+    return sf::Vector2f(vector.x / magnitude, vector.y / magnitude);
+}
 
 int main()
 {
@@ -100,13 +108,15 @@ int main()
 
     Player player;
     Scene scene;
-    Poop poop;
+    /*Poop poop;*/
     Heart heart;
 
     std::vector<projectil*> projectiles;
+    Poop* poops = new Poop();
 
     sf::Clock clock;
     sf::Clock endLarme;
+    sf::Clock moveEnemyClock;
 
     float frameDuration = 0.1f;
     float speedLarme = 500.f;
@@ -121,6 +131,8 @@ int main()
 
     float timeSinceLastShot = 0.0f; // Temps écoulé depuis le dernier tir
     float fireInterval = 0.5f;
+
+    bool poopIsDead = false;
 
     std::map<sf::Keyboard::Key, float> fireTimers = {
         {sf::Keyboard::Up, 0.f},
@@ -262,7 +274,6 @@ int main()
         for (auto it = projectiles.begin(); it != projectiles.end(); ) 
         {
             bool collisionDetected = false;
-
             // Vérifier la collision avec chaque mur (ou autre objet)
             for (auto& wall : walls) 
             {
@@ -364,6 +375,9 @@ int main()
             }
         }
 
+        float delta = moveEnemyClock.restart().asSeconds();
+        sf::Vector2f direction = normalize(player.getPosition() - poops[0].getPosition());
+
         if (currentRoom == 0)
         {
             if (player.DoorsCollision(door1, player.Bounds(player.spritePlayer)) && sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
@@ -372,6 +386,7 @@ int main()
                 totalRoom = currentSheetsRoom.size();
                 currentRoom = 1;
                 player.setPosition(door3.getPosition());
+
                 scene.room.setTexture(*currentSheetsRoom[currentRoom]);
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
@@ -433,12 +448,56 @@ int main()
                     it = projectiles.erase(it);
                 }
             }
+
+            poops[0].move(delta* poops[0].speedEnemy* direction.x, delta* poops[0].speedEnemy* direction.y);
+
+            for (auto it = projectiles.begin(); it != projectiles.end();)
+            {
+                if ((*it)->Bounds((*it)->spriteLarmeBase).intersects(poops[0].Bounds(poops[0].spritePoop)))
+                {
+                    if ((*it)->direction.x > 0)
+                    {
+                        poops[0].setPosition(poops[0].getPosition().x + 30, poops[0].getPosition().y);
+                    }
+                    else if ((*it)->direction.x < 0)
+                    {
+                        poops[0].setPosition(poops[0].getPosition().x - 30, poops[0].getPosition().y);
+                    }
+                    else if ((*it)->direction.y > 0)
+                    {
+                        poops[0].setPosition(poops[0].getPosition().x, poops[0].getPosition().y + 30);
+                    }
+                    else if ((*it)->direction.y < 0)
+                    {
+                        poops[0].setPosition(poops[0].getPosition().x, poops[0].getPosition().y - 30);
+                    }
+
+                    // Collision détectée, supprimer le projectile
+                    it = projectiles.erase(it);
+                    poops[0].mCurrentHealth -= player.mAttack;
+
+                }
+
+                else
+                {
+                    ++it;
+                }
+
+                if (poops[0].isDead())
+                {
+                    delete (poops);
+                    poopIsDead = true;
+                    break;
+                }
+            }
         }
 
         if (currentRoom == 2)
         {
             if (player.OtherCollision(shopik, player.Bounds(player.spritePlayer)))
             {
+                player.mCurrentHealth -= 1;
+
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
                 {
                     player.move(-0.05f, 0.f);
@@ -535,6 +594,8 @@ int main()
                 const auto& currentSheetsRoom = scene.sheetsRoom;
                 totalRoom = currentSheetsRoom.size();
                 currentRoom = 3;
+
+                player.setPosition(door2.getPosition().x + 70, door2.getPosition().y + 180);
                 scene.room.setTexture(*currentSheetsRoom[currentRoom]);
                 player.Bounds(player.spritePlayer) = player.spritePlayer.getGlobalBounds();
 
@@ -606,7 +667,9 @@ int main()
             heart.Heart2.setTexture(heart.emptyHeart);
             heart.Heart3.setTexture(heart.emptyHeart);
         }
-       
+
+        window.clear();
+
         window.draw(scene);
         if (currentRoom == 5)
         {
@@ -619,7 +682,21 @@ int main()
             window.draw(aide);
             window.draw(crédits);
         }
+        else if (currentRoom == 1)
+        {
+            if (!poopIsDead)
+            {
+                window.draw(poops[0]);
+            }
 
+            window.draw(player);
+            window.draw(heart);
+
+            for (projectil* proj : projectiles)
+            {
+                window.draw(*proj);
+            }
+        }
         else
         {
             window.draw(door1);
@@ -632,17 +709,17 @@ int main()
             window.draw(wall4);
             window.draw(shopik);
             window.draw(HangingMan);
-            window.draw(poop);
 
             window.draw(heart);
 
             window.draw(player);
+            for (projectil* proj : projectiles)
+            {
+                window.draw(*proj);
+            }
         }
 
-        for (projectil* proj : projectiles) 
-        {
-            window.draw(*proj);
-        }
+        
 
         window.display();
     }

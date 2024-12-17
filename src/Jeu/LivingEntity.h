@@ -10,5 +10,6 @@ public:
 	int mCurrentHealth;
 	int mAttack;
 
+	bool isDead();
 };
 

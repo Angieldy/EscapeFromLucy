@@ -7,7 +7,7 @@ Player::Player()
 {
 
 	mMaxHealth = 12;
-	mCurrentHealth = 5;
+	mCurrentHealth = 12;
 	mAttack = 1;
 
 	if (!texturePause1.loadFromFile("../../../src/Jeu/png/persoSkin.png", sf::IntRect(17, 13, 31, 38))) //777x513
@@ -184,7 +184,7 @@ Player::Player()
 	}
 
 	spritePlayer.setTexture(texturePause1);
-	setPosition(700, 400);
+	setPosition(800, 500);
 	spritePlayer.setOrigin(15.5f, 19.f);
 	spritePlayer.setScale(sf::Vector2f(3.f, 3.f));
 

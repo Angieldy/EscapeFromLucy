@@ -3,5 +3,10 @@
 
 class Enemy :public LivingEntity
 {
+
+public:
+	float speedEnemy;
+
+
 };
 

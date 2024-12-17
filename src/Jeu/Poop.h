@@ -10,7 +10,7 @@ public:
 	sf::Texture PoopLittle;
 	sf::Texture PoopCrushed;
 
-	sf::Sprite spritePoopBase;
+	sf::Sprite spritePoop;
 
 	std::vector<sf::Texture*> sheetsPoop;
 

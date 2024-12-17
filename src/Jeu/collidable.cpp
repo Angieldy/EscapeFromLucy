@@ -15,9 +15,9 @@ sf::FloatRect collidable::Bounds(sf::Sprite object)
 	return GlobalBounds;
 }
 
-bool collidable::collideSprite(const sf::Sprite& other1, const sf::Sprite& other2) const
+bool collidable::collideSprite(const sf::FloatRect& other1, const sf::FloatRect& other2) const
 {
-	if (other1.getGlobalBounds().intersects(other2.getGlobalBounds()))
+	if (other1.intersects(other2))
 	{
 		return true;
 	}

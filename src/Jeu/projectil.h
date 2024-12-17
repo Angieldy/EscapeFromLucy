@@ -1,9 +1,8 @@
 #pragma once
 #include "collidable.h"
 #include "MovableEntity.h"
-#include "Attaque.h"
 
-class projectil : public collidable, public Attaque
+class projectil : public collidable
 {
 public:
 	sf::Texture txtLarmeBase;
