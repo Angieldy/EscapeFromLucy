@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "main.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -11,6 +12,7 @@
 #include "Poop.h"
 #include "Heart.h"
 #include "Enemy.h"
+#include "Patate.h"
 
 sf::Vector2f normalize(const sf::Vector2f& vector) {
     float magnitude = std::sqrt(vector.x * vector.x + vector.y * vector.y);
@@ -27,6 +29,13 @@ int main()
 #endif
 
     sf::RenderWindow window(sf::VideoMode(1600, 1000), "Escape From Lucy");
+
+    sf::Music music;
+    music.openFromFile("../../../src/Jeu/music.wav");
+
+    music.setLoop(true);
+    music.setVolume(50.f);
+    music.play();
 
     std::vector<sf::RectangleShape> walls;
     std::vector<sf::RectangleShape> doors;
@@ -92,6 +101,12 @@ int main()
     HangingMan.setScale(3, 3);
     other.push_back(HangingMan);
 
+    sf::RectangleShape letter(sf::Vector2f(50, 50));
+    letter.setFillColor(sf::Color(255, 255, 255, 150));
+    letter.setPosition(700, 550);
+    letter.setScale(3, 3);
+    other.push_back(letter);
+
     sf::Font font;
 
     if (!font.loadFromFile("../../../src/Jeu/png/font.ttf"))
@@ -103,20 +118,35 @@ int main()
     sf::Text jouer;
     sf::Text options;
     sf::Text aide;
-    sf::Text crédits;
+    sf::Text credits;
+    sf::Text quit;
+    sf::Text txtgo;
 
 
     Player player;
     Scene scene;
-    /*Poop poop;*/
     Heart heart;
+    Patate patate;
 
     std::vector<projectil*> projectiles;
-    Poop* poops = new Poop();
+
+    std::vector<Poop*> enemyPoop;
+    Poop* Poop1 = new Poop();
+    enemyPoop.push_back(Poop1);
+
+    std::vector<Patate*> enemyPatate;
+    Patate* Patate1 = new Patate();
+    enemyPatate.push_back(Patate1);
+    Patate* Patate2 = new Patate();
+    Patate2->setPosition(900, 300);
+    enemyPatate.push_back(Patate2);
+
 
     sf::Clock clock;
     sf::Clock endLarme;
     sf::Clock moveEnemyClock;
+    sf::Clock invincibilityClock;
+    sf::Time invincibilityDuration = sf::seconds(2);
 
     float frameDuration = 0.1f;
     float speedLarme = 500.f;
@@ -133,6 +163,8 @@ int main()
     float fireInterval = 0.5f;
 
     bool poopIsDead = false;
+    bool takeDamage = false;
+    bool isPaused = false;
 
     std::map<sf::Keyboard::Key, float> fireTimers = {
         {sf::Keyboard::Up, 0.f},
@@ -297,7 +329,6 @@ int main()
 
         if (currentRoom == 5)
         {
-            player.spritePlayer.setColor(sf::Color(255, 255, 255, 1));
 
             scene.room.setPosition(400, 50);
             scene.room.setScale(0.8, 0.8);
@@ -324,31 +355,35 @@ int main()
             scene.room.setScale(3, 3);
             scene.room.setTextureRect(sf::IntRect(0, 0, 510, 596));
 
-            player.spritePlayer.setColor(sf::Color(255, 255, 255, 1));
-
             jouer.setFont(font);
             jouer.setString("Jouer");
             jouer.setCharacterSize(60);
             jouer.setFillColor(sf::Color::White);
-            jouer.setPosition(670, 650);
+            jouer.setPosition(670, 625);
 
             options.setFont(font);
             options.setString("Options");
             options.setCharacterSize(60);
             options.setFillColor(sf::Color::White);
-            options.setPosition(630, 725);
+            options.setPosition(630, 700);
 
             aide.setFont(font);
             aide.setString("aide");
             aide.setCharacterSize(60);
             aide.setFillColor(sf::Color::White);
-            aide.setPosition(690, 800);
+            aide.setPosition(690, 775);
 
-            crédits.setFont(font);
-            crédits.setString("Credits");
-            crédits.setCharacterSize(60);
-            crédits.setFillColor(sf::Color::White);
-            crédits.setPosition(630, 875);
+            credits.setFont(font);
+            credits.setString("Credits");
+            credits.setCharacterSize(60);
+            credits.setFillColor(sf::Color::White);
+            credits.setPosition(630, 850);
+
+            quit.setFont(font);
+            quit.setString("Quitter");
+            quit.setCharacterSize(60);
+            quit.setFillColor(sf::Color::White);
+            quit.setPosition(630, 925);
 
             if (event.type == sf::Event::MouseButtonPressed)
             {
@@ -356,9 +391,13 @@ int main()
                 {
                     sf::Vector2i mousePos = sf::Mouse::getPosition(window);
 
-                    sf::FloatRect textBounds = jouer.getGlobalBounds();
+                    sf::FloatRect jouerBounds = jouer.getGlobalBounds();
+                    sf::FloatRect optionsBounds = options.getGlobalBounds();
+                    sf::FloatRect aideBounds = aide.getGlobalBounds();
+                    sf::FloatRect creditsBounds = credits.getGlobalBounds();
+                    sf::FloatRect quitBounds = quit.getGlobalBounds();
 
-                    if (textBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                    if (jouerBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
                     {
                         const auto& currentSheetsRoom = scene.sheetsRoom;
                         totalRoom = currentSheetsRoom.size();
@@ -368,15 +407,54 @@ int main()
                         scene.room.setPosition(100, 25);
                         scene.room.setTextureRect(sf::IntRect(0, 0, 460, 305));
                         scene.room.setScale(3, 3);
+                    }
+                    else if (optionsBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                    {
+                        const auto& currentSheetsRoom = scene.sheetsRoom;
+                        totalRoom = currentSheetsRoom.size();
+                        currentRoom = 9;
+                        scene.room.setTexture(*currentSheetsRoom[currentRoom]);
 
-                        player.spritePlayer.setColor(sf::Color(255, 255, 255, 255));
+                        scene.room.setPosition(400, 150);
+                        scene.room.setTextureRect(sf::IntRect(0, 0, 239, 229));
+                        scene.room.setScale(3, 3);
+                    }
+                    else if (aideBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                    {
+                        const auto& currentSheetsRoom = scene.sheetsRoom;
+                        totalRoom = currentSheetsRoom.size();
+                        currentRoom = 7;
+                        scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                        scene.room.setPosition(400, 150);
+                        scene.room.setTextureRect(sf::IntRect(0, 0, 239, 229));
+                        scene.room.setScale(3, 3);
+
+                    }
+                    else if (creditsBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                    {
+                        const auto& currentSheetsRoom = scene.sheetsRoom;
+                        totalRoom = currentSheetsRoom.size();
+                        currentRoom = 10;
+                        scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                        scene.room.setPosition(400, 150);
+                        scene.room.setTextureRect(sf::IntRect(0, 0, 239, 229));
+                        scene.room.setScale(3, 3);
+                    }
+                    else if (quitBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                    {
+                        return -1;
                     }
                 }
             }
         }
 
         float delta = moveEnemyClock.restart().asSeconds();
-        sf::Vector2f direction = normalize(player.getPosition() - poops[0].getPosition());
+        sf::Vector2f directionPoop = normalize(player.getPosition() - Poop1->getPosition());
+
+        sf::Vector2f directionPatate1 = normalize(player.getPosition() - Patate1->getPosition());
+        sf::Vector2f directionPatate2 = normalize(player.getPosition() - Patate2->getPosition());
 
         if (currentRoom == 0)
         {
@@ -449,32 +527,48 @@ int main()
                 }
             }
 
-            poops[0].move(delta* poops[0].speedEnemy* direction.x, delta* poops[0].speedEnemy* direction.y);
+            Poop1->move(delta* Poop1->speedEnemy* directionPoop.x, delta* Poop1->speedEnemy* directionPoop.y);
+
+            if (Poop1->collideSprite(Poop1->Bounds(Poop1->spritePoop), player.Bounds(player.spritePlayer)))
+            {
+                if (!takeDamage) {
+                    // Le joueur perd de la vie
+                    player.mCurrentHealth--;
+
+                    // Activer l'invincibilité
+                    takeDamage = true;
+                    invincibilityClock.restart();
+                }
+
+                if (takeDamage && invincibilityClock.getElapsedTime() > invincibilityDuration) {
+                    takeDamage = false; // Fin de l'invincibilité
+                }
+            }
 
             for (auto it = projectiles.begin(); it != projectiles.end();)
             {
-                if ((*it)->Bounds((*it)->spriteLarmeBase).intersects(poops[0].Bounds(poops[0].spritePoop)))
+                if ((*it)->Bounds((*it)->spriteLarmeBase).intersects(Poop1->Bounds(Poop1->spritePoop)))
                 {
                     if ((*it)->direction.x > 0)
                     {
-                        poops[0].setPosition(poops[0].getPosition().x + 30, poops[0].getPosition().y);
+                        Poop1->setPosition(Poop1->getPosition().x + 30, Poop1->getPosition().y);
                     }
                     else if ((*it)->direction.x < 0)
                     {
-                        poops[0].setPosition(poops[0].getPosition().x - 30, poops[0].getPosition().y);
+                        Poop1->setPosition(Poop1->getPosition().x - 30, Poop1->getPosition().y);
                     }
                     else if ((*it)->direction.y > 0)
                     {
-                        poops[0].setPosition(poops[0].getPosition().x, poops[0].getPosition().y + 30);
+                        Poop1->setPosition(Poop1->getPosition().x, Poop1->getPosition().y + 30);
                     }
                     else if ((*it)->direction.y < 0)
                     {
-                        poops[0].setPosition(poops[0].getPosition().x, poops[0].getPosition().y - 30);
+                        Poop1->setPosition(Poop1->getPosition().x, Poop1->getPosition().y - 30);
                     }
 
                     // Collision détectée, supprimer le projectile
                     it = projectiles.erase(it);
-                    poops[0].mCurrentHealth -= player.mAttack;
+                    Poop1->mCurrentHealth -= player.mAttack;
 
                 }
 
@@ -482,12 +576,19 @@ int main()
                 {
                     ++it;
                 }
+            }
 
-                if (poops[0].isDead())
+            for (auto it = enemyPoop.begin(); it != enemyPoop.end(); ) 
+            {
+                // Si un ennemi est mort, le retirer
+                if ((*it)->isDead()) 
                 {
-                    delete (poops);
-                    poopIsDead = true;
-                    break;
+                    delete* it;
+                    it = enemyPoop.erase(it); // Retourne le nouvel itérateur
+                }
+                else 
+                {
+                    ++it;
                 }
             }
         }
@@ -496,7 +597,18 @@ int main()
         {
             if (player.OtherCollision(shopik, player.Bounds(player.spritePlayer)))
             {
-                player.mCurrentHealth -= 1;
+                if (!takeDamage) {
+                    // Le joueur perd de la vie
+                    player.mCurrentHealth--;
+
+                    // Activer l'invincibilité
+                    takeDamage = true;
+                    invincibilityClock.restart();
+                }
+
+                if (takeDamage && invincibilityClock.getElapsedTime() > invincibilityDuration) {
+                    takeDamage = false; // Fin de l'invincibilité
+                }
 
                 if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
                 {
@@ -585,6 +697,120 @@ int main()
                     it = projectiles.erase(it);
                 }
             }
+
+            Patate1->move(delta* Patate1->speedEnemy* directionPatate1.x, delta* Patate1->speedEnemy* directionPatate1.y);
+            Patate2->move(delta* Patate2->speedEnemy* directionPatate2.x, delta* Patate2->speedEnemy* directionPatate2.y);
+
+            if (Patate1->collideSprite(Patate1->Bounds(Patate1->spritePatate), player.Bounds(player.spritePlayer)))
+            {
+                if (!takeDamage) {
+                    // Le joueur perd de la vie
+                    player.mCurrentHealth--;
+
+                    // Activer l'invincibilité
+                    takeDamage = true;
+                    invincibilityClock.restart();
+                }
+
+                if (takeDamage && invincibilityClock.getElapsedTime() > invincibilityDuration) {
+                    takeDamage = false; // Fin de l'invincibilité
+                }
+            }
+
+            if (Patate2->collideSprite(Patate2->Bounds(Patate2->spritePatate), player.Bounds(player.spritePlayer)))
+            {
+                if (!takeDamage) {
+                    // Le joueur perd de la vie
+                    player.mCurrentHealth--;
+
+                    // Activer l'invincibilité
+                    takeDamage = true;
+                    invincibilityClock.restart();
+                }
+
+                if (takeDamage && invincibilityClock.getElapsedTime() > invincibilityDuration) {
+                    takeDamage = false; // Fin de l'invincibilité
+                }
+            }
+
+            for (auto it = projectiles.begin(); it != projectiles.end();)
+            {
+                if ((*it)->Bounds((*it)->spriteLarmeBase).intersects(Patate1->Bounds(Patate1->spritePatate)))
+                {
+                    if ((*it)->direction.x > 0)
+                    {
+                        Patate1->setPosition(Patate1->getPosition().x + 30, Patate1->getPosition().y);
+                    }
+                    else if ((*it)->direction.x < 0)
+                    {
+                        Patate1->setPosition(Patate1->getPosition().x - 30, Patate1->getPosition().y);
+                    }
+                    else if ((*it)->direction.y > 0)
+                    {
+                        Patate1->setPosition(Patate1->getPosition().x, Patate1->getPosition().y + 30);
+                    }
+                    else if ((*it)->direction.y < 0)
+                    {
+                        Patate1->setPosition(Patate1->getPosition().x, Patate1->getPosition().y - 30);
+                    }
+
+                    // Collision détectée, supprimer le projectile
+                    it = projectiles.erase(it);
+                    Patate1->mCurrentHealth -= player.mAttack;
+                }
+
+                else
+                {
+                    ++it;
+                }
+            }
+
+            for (auto it = projectiles.begin(); it != projectiles.end(); )
+            {
+                if ((*it)->Bounds((*it)->spriteLarmeBase).intersects(Patate2->Bounds(Patate2->spritePatate)))
+                {
+                    if ((*it)->direction.x > 0)
+                    {
+                        Patate2->setPosition(Patate2->getPosition().x + 30, Patate2->getPosition().y);
+                    }
+                    else if ((*it)->direction.x < 0)
+                    {
+                        Patate2->setPosition(Patate2->getPosition().x - 30, Patate2->getPosition().y);
+                    }
+                    else if ((*it)->direction.y > 0)
+                    {
+                        Patate2->setPosition(Patate2->getPosition().x, Patate2->getPosition().y + 30);
+                    }
+                    else if ((*it)->direction.y < 0)
+                    {
+                        Patate2->setPosition(Patate2->getPosition().x, Patate2->getPosition().y - 30);
+                    }
+
+                    // Collision détectée, supprimer le projectile
+                    it = projectiles.erase(it);
+                    Patate2->mCurrentHealth -= player.mAttack;
+
+                }
+
+                else
+                {
+                    ++it;
+                }
+            }
+
+            for (auto it = enemyPatate.begin(); it != enemyPatate.end(); )
+            {
+                // Si un ennemi est mort, le retirer
+                if ((*it)->isDead())
+                {
+                    delete* it;
+                    it = enemyPatate.erase(it); // Retourne le nouvel itérateur
+                }
+                else
+                {
+                    ++it;
+                }
+            }
         }
 
         if (currentRoom == 4)
@@ -604,6 +830,133 @@ int main()
                 {
                     it = projectiles.erase(it);
                 }
+            }
+        }
+
+        if (currentRoom == 8)
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            {
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                currentRoom = 6;
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift))
+            {
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                currentRoom = 11;
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                scene.room.setPosition(400, 150);
+                scene.room.setTextureRect(sf::IntRect(0, 0, 263, 225));
+                scene.room.setScale(3, 3);
+            }
+        }
+
+        if (currentRoom == 11)
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                isPaused = true;
+
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                currentRoom = 8;
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                scene.room.setPosition(400, 150);
+                scene.room.setTextureRect(sf::IntRect(0, 0, 239, 229));
+                scene.room.setScale(3, 3);
+            }
+        }
+
+        if (currentRoom == 12)
+        {
+            txtgo.setFont(font);
+            txtgo.setString("Cliquez sur l'enveloppe ouverte..");
+            txtgo.setCharacterSize(60);
+            txtgo.setFillColor(sf::Color::Red);
+            txtgo.setPosition(300, 925);
+
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            {
+                sf::Vector2i mousePos = sf::Mouse::getPosition(window);
+
+                sf::FloatRect letterBounds = letter.getGlobalBounds();
+
+                if (letterBounds.contains(static_cast<float>(mousePos.x), static_cast<float>(mousePos.y)))
+                {
+                    const auto& currentSheetsRoom = scene.sheetsRoom;
+                    totalRoom = currentSheetsRoom.size();
+                    currentRoom = 13;
+                    scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                    scene.room.setPosition(100, 25);
+                    scene.room.setTextureRect(sf::IntRect(0, 0, 610, 706));
+                    scene.room.setScale(3, 3);
+                }
+            }
+
+            if (currentRoom == 7 || currentRoom == 9 || currentRoom == 10)
+            {
+                if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+                {
+                    const auto& currentSheetsRoom = scene.sheetsRoom;
+                    totalRoom = currentSheetsRoom.size();
+                    currentRoom = 6;
+                    scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+                }
+            }
+        }
+        if (currentRoom == 9 || currentRoom == 11)
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad0))
+            {
+                music.setVolume(0.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad1))
+            {
+                music.setVolume(10.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad2))
+            {
+                music.setVolume(20.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad3))
+            {
+                music.setVolume(30.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad4))
+            {
+                music.setVolume(40.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad5))
+            {
+                music.setVolume(50.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad6))
+            {
+                music.setVolume(60.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad7))
+            {
+                music.setVolume(70.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad8))
+            {
+                music.setVolume(85.f);
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Numpad9))
+            {
+                music.setVolume(100.f);
             }
         }
         
@@ -666,6 +1019,14 @@ int main()
             heart.Heart1.setTexture(heart.emptyHeart);
             heart.Heart2.setTexture(heart.emptyHeart);
             heart.Heart3.setTexture(heart.emptyHeart);
+            const auto& currentSheetsRoom = scene.sheetsRoom;
+            totalRoom = currentSheetsRoom.size();
+            currentRoom = 12;
+            scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+            scene.room.setPosition(300, 0);
+            scene.room.setScale(1.f, 1.f);
+            scene.room.setTextureRect(sf::IntRect(0, 0, 1024, 1024));
         }
 
         window.clear();
@@ -680,13 +1041,14 @@ int main()
             window.draw(jouer);
             window.draw(options);
             window.draw(aide);
-            window.draw(crédits);
+            window.draw(credits);
+            window.draw(quit);
         }
         else if (currentRoom == 1)
         {
-            if (!poopIsDead)
+            for (Poop* po : enemyPoop)
             {
-                window.draw(poops[0]);
+                window.draw(*po);
             }
 
             window.draw(player);
@@ -696,7 +1058,56 @@ int main()
             {
                 window.draw(*proj);
             }
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                isPaused = true;
+
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                currentRoom = 8;
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                scene.room.setPosition(400, 150);
+                scene.room.setTextureRect(sf::IntRect(0, 0, 239, 229));
+                scene.room.setScale(3, 3);
+            }
         }
+        else if (currentRoom == 3)
+        {
+            for (Patate* pa : enemyPatate)
+            {
+                window.draw(*pa);
+            }
+            window.draw(player);
+            window.draw(heart);
+            for (projectil* proj : projectiles)
+            {
+                window.draw(*proj);
+            }
+        }
+        else if (currentRoom == 12)
+        {
+            window.draw(txtgo);
+            window.draw(letter);
+        }
+
+        else if (currentRoom == 8 || currentRoom == 13 || currentRoom == 11)
+        {
+
+        }
+
+        else if (currentRoom == 7 || currentRoom == 9 || currentRoom == 10)
+        {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            {
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                currentRoom = 6;
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+            }
+        }
+
         else
         {
             window.draw(door1);
@@ -717,9 +1128,22 @@ int main()
             {
                 window.draw(*proj);
             }
-        }
 
-        
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+            {
+                isPaused = true;
+                
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                currentRoom = 8;
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                scene.room.setPosition(400, 150);
+                scene.room.setTextureRect(sf::IntRect(0, 0, 239, 229));
+                scene.room.setScale(3, 3);
+            }
+            
+        }
 
         window.display();
     }

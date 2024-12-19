@@ -7,7 +7,7 @@ Player::Player()
 {
 
 	mMaxHealth = 12;
-	mCurrentHealth = 12;
+	mCurrentHealth = 1;
 	mAttack = 1;
 
 	if (!texturePause1.loadFromFile("../../../src/Jeu/png/persoSkin.png", sf::IntRect(17, 13, 31, 38))) //777x513

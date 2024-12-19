@@ -12,6 +12,13 @@ public:
 	sf::Texture bossroom; //4
 	sf::Texture logo; //5
 	sf::Texture launcher; //6
+	sf::Texture aide; //7
+	sf::Texture menu;//8
+	sf::Texture options;//9
+	sf::Texture credits;//10
+	sf::Texture optionsMenu; //11
+	sf::Texture gameOver; //12
+	sf::Texture letter; //13
 
 	sf::Sprite room;
 

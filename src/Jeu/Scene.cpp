@@ -39,6 +39,41 @@ Scene::Scene()
         std::cerr << "Impossible de charger la texture launcher!" << std::endl;
     }
 
+    if (!aide.loadFromFile("../../../src/Jeu/png/aide.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
+    if (!menu.loadFromFile("../../../src/Jeu/png/Menu.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
+    if (!options.loadFromFile("../../../src/Jeu/png/options.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
+    if (!credits.loadFromFile("../../../src/Jeu/png/credits.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
+    if (!optionsMenu.loadFromFile("../../../src/Jeu/png/optionsMenu.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
+    if (!gameOver.loadFromFile("../../../src/Jeu/png/gameover.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
+    if (!letter.loadFromFile("../../../src/Jeu/png/letter.png"))
+    {
+        std::cerr << "Impossible de charger la texture launcher!" << std::endl;
+    }
+
     room.setTexture(logo);
     room.setPosition(100, 25);//400 50
     room.setTextureRect(sf::IntRect(0, 0, 460, 305));
@@ -51,6 +86,13 @@ Scene::Scene()
     sheetsRoom.push_back(&bossroom); //4
     sheetsRoom.push_back(&logo); //5
     sheetsRoom.push_back(&launcher); //6
+    sheetsRoom.push_back(&aide); //7
+    sheetsRoom.push_back(&menu); //8
+    sheetsRoom.push_back(&options); //9
+    sheetsRoom.push_back(&credits); //10
+    sheetsRoom.push_back(&optionsMenu); //11
+    sheetsRoom.push_back(&gameOver); //12
+    sheetsRoom.push_back(&letter); //13
 }
 
 void Scene::draw(sf::RenderTarget& target, sf::RenderStates states) const
