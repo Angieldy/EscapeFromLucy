@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "main.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
 #include <vector>
@@ -15,6 +16,7 @@
 #include "Patate.h"
 #include "ProjectileEnemy.h"
 #include "objet.h"
+#include "Boss.h"
 
 sf::Vector2f normalize(const sf::Vector2f& vector) {
     float magnitude = std::sqrt(vector.x * vector.x + vector.y * vector.y);
@@ -29,7 +31,7 @@ int main()
 #ifdef _DEBUG
 	_CrtDumpMemoryLeaks();
 #endif
-
+    
     sf::RenderWindow window(sf::VideoMode(1600, 1000), "Escape From Lucy");
 
     sf::Music music;
@@ -109,6 +111,12 @@ int main()
     letter.setScale(3, 3);
     other.push_back(letter);
 
+    sf::CircleShape warningCircle(50.f);
+    warningCircle.setFillColor(sf::Color::Transparent);
+    warningCircle.setOutlineColor(sf::Color::Red);
+    warningCircle.setOutlineThickness(2.f);
+    warningCircle.setOrigin(50.f, 50.f);
+
     sf::Font font;
 
     if (!font.loadFromFile("../../../src/Jeu/png/font.ttf"))
@@ -130,6 +138,7 @@ int main()
     Heart heart;
     Patate patate;
     Objet object;
+    Boss boss;
 
 
     std::vector<projectil*> projectiles;
@@ -151,6 +160,7 @@ int main()
     sf::Clock endLarme;
     sf::Clock moveEnemyClock;
     sf::Clock enemyShootClock;
+    sf::Clock BossAttaqueClock;
     sf::Clock invincibilityClock;
     sf::Time invincibilityDuration = sf::seconds(2);
 
@@ -179,6 +189,19 @@ int main()
 
     bool itemCoin = false;
     bool itemKey = false;
+    bool itemLife = false;
+
+
+    sf::Vector2f targetPosition;       
+    bool isWarningActive = false;      
+    bool isAttackActive = false;       
+    float warningDuration = 1.5f;      
+    float warningTimer = 0.f;          
+    bool warningVisible = true;        
+    float legSpeed = 500.f;     
+    float enemyAttackTimer = 0.f;      
+    float enemyAttackInterval = 3.f;
+
 
     std::map<sf::Keyboard::Key, float> fireTimers = {
         {sf::Keyboard::Up, 0.f},
@@ -218,7 +241,7 @@ int main()
                     clock.restart();
                 }
                 //std::cout << player.getPosition().x << player.getPosition().y << std::endl;
-                player.move(0.5f, 0.f);
+                player.move(0.05f, 0.f);
             }
 
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q) && !player.WallCollision(wall1, player.Bounds(player.spritePlayer)))//150
@@ -234,7 +257,7 @@ int main()
                 }
                 //std::cout << player.getPosition().x << player.getPosition().y << std::endl;
 
-                player.move(-0.5f, 0.f);
+                player.move(-0.05f, 0.f);
             }
 
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) && !player.WallCollision(wall4, player.Bounds(player.spritePlayer)))//530
@@ -250,7 +273,7 @@ int main()
                 }
                 //std::cout << player.getPosition().x << player.getPosition().y << std::endl;
 
-                player.move(0.f, 0.5f);
+                player.move(0.f, 0.05f);
             }
 
             else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z) && !player.WallCollision(wall2, player.Bounds(player.spritePlayer)))//60
@@ -266,7 +289,7 @@ int main()
                 }
                 //std::cout << player.getPosition().x << player.getPosition().y << std::endl;
 
-                player.move(0.f, -0.5f);
+                player.move(0.f, -0.05f);
             }
 
             else if (event.type == sf::Event::KeyReleased)
@@ -1015,7 +1038,9 @@ int main()
                         ++it;
                     }
                 }
+                srand(time(NULL));
 
+                int life = rand() % 100;
                 for (auto it = enemyPatate.begin(); it != enemyPatate.end(); )
                 {
                     // Si un ennemi est mort, le retirer
@@ -1023,12 +1048,31 @@ int main()
                     {
                         delete* it;
                         it = enemyPatate.erase(it); // Retourne le nouvel itérateur
+
+                        if (life >= 50)
+                        {
+                            const auto& currentitems = object.items;
+                            totalObjet = currentitems.size();
+                            currentitem = 2;
+                            object.item.setTexture(*currentitems[currentitem]);
+                            object.item.setPosition(700, 400);
+                            object.item.setColor(sf::Color(255, 255, 255, 255));
+                        }
                     }
                     else
                     {
                         ++it;
                     }
                 }
+                if (player.collideSprite(object.Bounds(object.item), player.Bounds(player.spritePlayer)))
+                {
+                    object.item.setColor(sf::Color(255, 255, 255, 1));
+                    object.sac.push_back(&object.heart);
+                    itemLife = true;
+
+                    player.mCurrentHealth += 1;
+                }
+
             }
 
             if (currentRoom == 4)
@@ -1047,6 +1091,51 @@ int main()
                     for (auto it = projectiles.begin(); it != projectiles.end(); )
                     {
                         it = projectiles.erase(it);
+                    }
+                }
+
+                if (enemyAttackTimer >= enemyAttackInterval && !isWarningActive && !isAttackActive) 
+                {
+                    targetPosition = player.getPosition() + sf::Vector2f(25.f, 25.f); // Cible le centre du joueur
+                    warningCircle.setPosition(targetPosition);
+                    warningTimer = 0.f;
+                    isWarningActive = true;
+                    warningVisible = true;
+                    enemyAttackTimer = 0.f; // Réinitialise le timer d'attaque de l'ennemi
+                }
+
+                if (isWarningActive) 
+                {
+                    warningTimer += deltaTime;
+
+                    // Clignotement (une alternance toutes les 0.3s)
+                    if (static_cast<int>(warningTimer * 10) % 6 == 0) {
+                        warningVisible = !warningVisible;
+                    }
+
+                    if (warningTimer >= warningDuration) {
+                        // Activer le projectile une fois l'alerte terminée
+                        boss.setPosition(boss.position + sf::Vector2f(25.f, 25.f)); // Part de l'ennemi
+                        isWarningActive = false;
+                        isAttackActive = true;
+                    }
+
+                    if (isAttackActive) 
+                    {
+                        sf::Vector2f directionBoss = targetPosition - boss.getPosition();
+                        float distance = std::sqrt(directionBoss.x * directionBoss.x + directionBoss.y * directionBoss.y);
+
+                        if (distance > 5.f) 
+                        {
+                            directionBoss /= distance; // Normalisation
+                            boss.move(directionBoss * legSpeed * deltaTime);
+                        }
+                        else 
+                        {
+                            // Collision ou fin d'attaque
+                            boss.setPosition(-100.f, -100.f); // Réinitialisation
+                            isAttackActive = false;
+                        }
                     }
                 }
             }
@@ -1335,6 +1424,13 @@ int main()
                     window.draw(*proj);
                 }
 
+                const sf::Texture* currentTexture = object.item.getTexture();
+
+                if (!itemLife && currentTexture == &object.heart)
+                {
+                    window.draw(object);
+                }
+
                 for (ProjectileEnemy* proj : proenemy)
                 {
                     window.draw(*proj);
@@ -1376,7 +1472,7 @@ int main()
                     window.draw(*proj);
                 }
             }
-            else if (currentRoom == 0 || currentRoom == 2 || currentRoom == 4)
+            else if (currentRoom == 4)
             {
                 const auto& currentSheetsRoom = scene.sheetsRoom;
                 totalRoom = currentSheetsRoom.size();
@@ -1394,8 +1490,16 @@ int main()
                 window.draw(wall2);
                 window.draw(wall3);
                 window.draw(wall4);
-                window.draw(shopik);
-                window.draw(HangingMan);
+
+                if (warningVisible && isWarningActive) 
+                {
+                    window.draw(warningCircle);
+                }
+
+                if (isAttackActive) 
+                {
+                    window.draw(boss);
+                }
 
                 window.draw(heart);
 
@@ -1406,8 +1510,39 @@ int main()
                     window.draw(*proj);
                 }
             }
-        }
 
+            else if (currentRoom == 0)
+            {
+                const auto& currentSheetsRoom = scene.sheetsRoom;
+                totalRoom = currentSheetsRoom.size();
+                scene.room.setTexture(*currentSheetsRoom[currentRoom]);
+
+                scene.room.setPosition(100, 25);//400 50
+                scene.room.setTextureRect(sf::IntRect(0, 0, 460, 305));
+                scene.room.setScale(3, 3);
+
+                window.draw(door1);
+                window.draw(door2);
+                window.draw(door3);
+                window.draw(door4);
+                window.draw(wall1);
+                window.draw(wall2);
+                window.draw(wall3);
+                window.draw(wall4);
+
+                window.draw(heart);
+
+                window.draw(player);
+
+                for (projectil* proj : projectiles)
+                {
+                    window.draw(*proj);
+                }
+
+               
+            }
+        }
+        
         window.display();
     }
 	return 0;

@@ -7,6 +7,7 @@ public:
 
 	sf::Texture satanicCoin;
 	sf::Texture goldKey;
+	sf::Texture heart;
 
 	sf::Sprite item;
 	std::vector<sf::Texture*> items;

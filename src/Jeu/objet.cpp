@@ -14,6 +14,11 @@ Objet::Objet()
         std::cerr << "Impossible de charger la texture clé!" << std::endl;
     }
 
+    if (!heart.loadFromFile("../../../src/Jeu/png/life.png"))
+    {
+        std::cerr << "Impossible de charger la texture life!" << std::endl;
+    }
+
     item.setTexture(satanicCoin);
     item.setPosition(100, 25);//400 50
     item.setTextureRect(sf::IntRect(0, 0, 26, 23));
@@ -22,6 +27,7 @@ Objet::Objet()
 
     items.push_back(&satanicCoin);
     items.push_back(&goldKey);
+    items.push_back(&heart);
 
 }
 
