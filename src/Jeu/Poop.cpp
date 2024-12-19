@@ -6,7 +6,7 @@ Poop::Poop()
 {
     mMaxHealth = 10;
     mCurrentHealth = 10;
-    mAttack = 2;
+    mAttack = 1;
     speedEnemy  = 200.f;
 
     if (!PoopBase.loadFromFile("../../../src/Jeu/png/caca mob.png", sf::IntRect(31, 38, 60, 60))) //512 x 128

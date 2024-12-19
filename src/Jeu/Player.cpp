@@ -7,7 +7,7 @@ Player::Player()
 {
 
 	mMaxHealth = 12;
-	mCurrentHealth = 1;
+	mCurrentHealth = 12;
 	mAttack = 1;
 
 	if (!texturePause1.loadFromFile("../../../src/Jeu/png/persoSkin.png", sf::IntRect(17, 13, 31, 38))) //777x513
@@ -232,11 +232,6 @@ Player::Player()
 	sheetsRight.push_back(&textureRigth9);
 	sheetsRight.push_back(&textureRigth10);
 
-
-	const sf::Vector2f spriteSize(
-		spritePlayer.getTexture()->getSize().x * spritePlayer.getScale().x,
-		spritePlayer.getTexture()->getSize().y * spritePlayer.getScale().y);
-	std::cerr << spriteSize.x << " " << spriteSize.y << std::endl;
 }
 
 void Player::draw(sf::RenderTarget& target, sf::RenderStates states) const

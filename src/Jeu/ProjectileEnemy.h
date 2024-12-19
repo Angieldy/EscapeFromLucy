@@ -1,17 +1,16 @@
 #pragma once
 #include "collidable.h"
 
-class projectil : public collidable
+class ProjectileEnemy : public collidable
 {
 public:
-	sf::Texture txtLarmeBase;
-	sf::Texture BlackLarme;
+	sf::Texture txtLarve;
 
-	sf::Sprite spriteLarmeBase;
+	sf::Sprite spriteLarve;
 
-	sf::Vector2f direction;
+	sf::Vector2f directionLarve;
 
-	projectil();
+	ProjectileEnemy();
 
 	void move(float deltaTime, float speed);
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
